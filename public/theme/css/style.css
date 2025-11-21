@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+.playfair-display{
+  font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+body{
+    color: #666666;
+    font-family: jost, sans-serif;
+    user-select: none;
+}
+@font-face {
+  font-family: 'jost';
+  src: url('../fonts/Jost/static/Jost-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: regular;
+}
+@font-face {
+  font-family: 'jost-medium';
+  src: url('../fonts/Jost/static/Jost-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: medium;
+}
+@font-face {
+  font-family: 'poppins-light';
+  src: url('../fonts/Poppins/Poppins-Light.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'poppins-semibold';
+  src: url('../fonts/Poppins/Poppins-SemiBold.ttf') format('truetype');
+}
+.jost{
+  font-family: "Jost", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+.jost-medium{
+  font-family: "Jost", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: medium;
+}
+.poppins-light {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+.poppins-semibold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600; /* semi-bold */
+  font-style: normal; /* normal style, not italic */
+  line-height: 100%;
+  
+}
+
+@font-face {
+  font-family: 'Felix Titling';
+  src: url('../fonts/FELIXTI.TTF') format('truetype');
+  font-weight: 400;
+  font-style: regular;
+}
+.Felix-Titling{
+  font-family: 'Felix Titling', serif;
+ font-weight: 400;
+  font-style: regular;
+  color: #222222;
+} 
+@font-face {
+  font-family: 'fanwood';
+  src: url('../fonts/Fanwood_Text/FanwoodText-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: regular;
+}
+
+.fanwood {
+  font-family: 'fanwood', serif;
+ font-weight: 400;
+  font-style: regular;
+  color: #222222;
+}
+
+
+.relative { position: relative; display: inline-block; }
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 110%;
+  border-radius: 10px;
+  border-right: 2px solid #d47a6a;
+  border-bottom: 2px solid #d47a6a;
+  left: 0;
+  background: linear-gradient(135deg, #fff, #f9e9e5);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  overflow: hidden;
+  min-width: 190px;
+  transform: translateY(10px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 50;
+}
+.relative:hover .dropdown {
+  display: block;
+  transform: translateY(0);
+  opacity: 1;
+}
+.dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+.dropdown a:hover {
+  background: #e5c0b8;
+  color: #000;
+  transform: translateX(5px);
+}
+.dropdown a i {
+  color: #d47a6a;
+  font-size: 18px;
+}
+
+  @keyframes slideIn {
+    from { transform: translateX(15px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  .animate-slideIn {
+    animation: slideIn 0.25s ease-out;
+  }
