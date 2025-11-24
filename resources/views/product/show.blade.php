@@ -1,7 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+@section('admin-content')
+ <div class="w-full px-4 py-6">
     <h2 class="text-3xl font-bold text-gray-900 mb-6">Product Details</h2>
     
     <div class="bg-white shadow-md rounded-lg p-6">

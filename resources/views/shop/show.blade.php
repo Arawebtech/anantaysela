@@ -3,6 +3,19 @@
 @section('title', $product->name . ' - ANANTA YSELA')
 
 @section('content')
+<style>
+  .custom-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scroll::-webkit-scrollbar-thumb {
+    background: #CD2C58;
+    border-radius: 10px;
+  }
+  .custom-scroll::-webkit-scrollbar-track {
+    background: #ffe1e7;
+  }
+</style>
+
 <!-- Banner Section -->
 <section class="relative text-center w-full">
   <img src="{{ asset('theme/imgs/bnnrImgs/ProductDetails.png') }}" alt="Banner" class="w-full h-auto">
@@ -23,9 +36,19 @@
           <img src="{{ \Illuminate\Support\Facades\Storage::url($product->image) }}" alt="Product Thumbnail" onclick="changeMainImage(this.src)" class="size-[100px] md:size-[140px] bg-gray-100 object-cover border rounded cursor-pointer hover:border-[#CD2C58]">
         @endif
       @endif
-      @for($i = 1; $i <= 3; $i++)
-        <img src="{{ asset('theme/imgs/home/' . $i . '.png') }}" alt="Product Thumbnail" onclick="changeMainImage(this.src)" class="size-[100px] md:size-[140px] bg-gray-100 object-cover border rounded cursor-pointer hover:border-[#CD2C58]">
-      @endfor
+      @php
+          $thumbnails = explode(',', $product->thumbnail_image);
+      @endphp
+
+      @foreach($thumbnails as $thumb)
+          @php $thumb = trim($thumb); @endphp
+          @if($thumb)
+              <img src="{{ Storage::url($thumb) }}" alt="Product Thumbnail"
+                  onclick="changeMainImage(this.src)"
+                  class="size-[100px] md:size-[140px] bg-gray-100 object-cover border rounded cursor-pointer hover:border-[#CD2C58]">
+          @endif
+      @endforeach
+
     </div>
     <!-- Main Image -->
     <div class="flex-1">
@@ -54,9 +77,9 @@
 
     <div class="flex items-center flex-wrap gap-2 md:gap-3">
       @if($product->original_price && $product->original_price > $product->current_price)
-        <p class="text-[#666666] text-[20px] md:text-[22px] line-through jost-medium">${{ number_format($product->original_price, 2) }}</p>
+        <p class="text-[#666666] text-[20px] md:text-[22px] line-through jost-medium">₹{{ number_format($product->original_price, 2) }}</p>
       @endif
-      <p class="text-[#E01A2B] text-[20px] md:text-[22px] jost font-semibold">${{ number_format($product->current_price, 2) }}</p>
+      <p class="text-[#E01A2B] text-[20px] md:text-[22px] jost font-semibold">₹{{ number_format($product->current_price, 2) }}</p>
       <div class="flex items-center gap-1">
         @for($i = 0; $i < 5; $i++)
           <i class="ri-star{{ $i < floor($product->rating ?? 4) ? '-fill' : '-line' }} text-yellow-500 text-[15px] md:text-[16px]"></i>
@@ -83,19 +106,34 @@
     </div>
 
     <!-- Size -->
-    <div>
-      <div class="flex justify-between items-center">
-        <h4 class="font-medium mb-1 text-[#222222] jost-medium">Size</h4>
-      </div>
-      <div class="flex flex-wrap gap-2 md:gap-3" id="sizeButtons">
         @php
-          $sizes = ['Medium', 'Large', 'Extra Large', 'XXL'];
-        @endphp
-        @foreach($sizes as $size)
-          <button class="px-3 md:px-4 py-1 border text-[#222222] jost text-[14px] md:text-[16px] border-gray-300 rounded cursor-pointer hover:border-[#CD2C58]" onclick="selectSize(this)">{{ $size }}</button>
+          // DB se aane wale sizes (example: ["M","L","XL"])
+          $selectedSizes = $product->size ? (is_array($product->size) ? $product->size : json_decode($product->size, true)) : [];
+          // Mapping: short → long text
+          $map = [
+              'S' => 'Small',
+              'M' => 'Medium',
+              'L' => 'Large',
+              'XL' => 'Extra Large',
+              'XXL' => 'XXL',
+              'XXXL' => '3XL',
+          ];
+      @endphp
+
+      <div class="flex flex-wrap gap-2 md:gap-3" id="sizeButtons">
+        @foreach($selectedSizes as $size)
+            @php
+                $label = $map[$size] ?? $size; // full name else same
+            @endphp
+            <button class="px-3 md:px-4 py-1 border text-[#222222] jost text-[14px] md:text-[16px] border-gray-300 rounded cursor-pointer hover:border-[#CD2C58]"
+                onclick="selectSize(this)"
+                data-value="{{ $size }}">
+                {{ $label }}
+            </button>
         @endforeach
       </div>
-    </div>
+
+
 
     <!-- Quantity & Add to Cart -->
     <div class="flex flex-col gap-4">
@@ -238,9 +276,9 @@
           </div>
           <span class="md:text-lg text-md">
             @if($relatedProduct->original_price && $relatedProduct->original_price > $relatedProduct->current_price)
-              <span class="line-through text-gray-500">${{ number_format($relatedProduct->original_price, 2) }}</span>
+              <span class="line-through text-gray-500">₹{{ number_format($relatedProduct->original_price, 2) }}</span>
             @endif
-            <span class="text-[#E01A2B] font-medium ml-1">${{ number_format($relatedProduct->current_price, 2) }}</span>
+            <span class="text-[#E01A2B] font-medium ml-1">₹{{ number_format($relatedProduct->current_price, 2) }}</span>
           </span>
         </div>
       </div>

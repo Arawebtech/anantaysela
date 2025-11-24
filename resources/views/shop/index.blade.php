@@ -48,7 +48,7 @@
         </button>
         <div class="accordion-content max-h-0 overflow-hidden transition-all duration-300 px-4">
           <input type="range" id="priceRange" min="0" max="1000" value="1000" class="w-full mt-2 accent-[#CD2C58]">
-          <p class="text-sm mt-1 text-gray-500">Up to $<span id="priceValue">1000</span></p>
+          <p class="text-sm mt-1 text-gray-500">Up to ₹<span id="priceValue">1000</span></p>
         </div>
       </div>
 
@@ -77,6 +77,7 @@
 
     <!-- Product Grid -->
     <div class="flex-1">
+
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-gray-700 text-lg">Showing {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} of {{ $products->total() ?? 0 }} results</h2>
         <form method="GET" action="{{ route('shop.index') }}" class="flex gap-2">
@@ -88,70 +89,7 @@
       </div>
 
       <main id="productGrid" class="grid grid-cols-2 lg:grid-cols-3 gap-6">
-        @forelse($products as $product)
-          <div class="product-card flex flex-col items-center bg-white relative transition">
-            <div class="relative w-full bg-gray-50 rounded overflow-hidden">
-              @if($product->original_price && $product->original_price > $product->current_price)
-                <span class="absolute top-2 left-2 text-xs md:text-sm bg-[#E01A2B] text-white font-medium px-2 py-1 rounded">
-                  -{{ round((($product->original_price - $product->current_price) / $product->original_price) * 100) }}%
-                </span>
-              @endif
-              
-              @auth
-                <form action="{{ route('wishlist.store') }}" method="POST" class="absolute top-2 right-2 wishlist-form" data-product-id="{{ $product->id }}">
-                  @csrf
-                  <input type="hidden" name="product_id" value="{{ $product->id }}">
-                  <button type="submit" onclick="event.stopPropagation();" class="bg-white size-[20px] md:size-[30px] flex items-center justify-center rounded-full shadow-md hover:bg-[#ffe8e8] transition wishlist-btn">
-                    <i class="ri-heart-line text-[#C26E72] text-center text-[12px] md:text-[18px] wishlist-icon"></i>
-                  </button>
-                </form>
-              @endauth
-
-              <a href="{{ route('shop.show', $product->id) }}">
-                @if($product->image)
-                  @if(str_starts_with($product->image, 'http'))
-                    <img src="{{ $product->image }}" alt="{{ $product->name }}" class="cursor-pointer w-full max-h-[8rem] md:max-h-72 object-contain">
-                  @else
-                    <img src="{{ \Illuminate\Support\Facades\Storage::url($product->image) }}" alt="{{ $product->name }}" class="cursor-pointer w-full max-h-[8rem] md:max-h-72 object-contain">
-                  @endif
-                @else
-                  <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
-                    <span class="text-gray-400">No Image</span>
-                  </div>
-                @endif
-              </a>
-            </div>
-            <div class="w-full mt-4">
-              <a href="{{ route('shop.show', $product->id) }}" class="text-start text-[16px] font-medium mb-2 jost line-clamp-2 block">
-                {{ $product->name }}
-              </a>
-              <div class="flex mb-2">
-                @for($r = 0; $r < 5; $r++)
-                  @if($r < floor($product->rating ?? 4))
-                    <i class="ri-star-fill text-yellow-400 text-sm md:text-base"></i>
-                  @else
-                    <i class="ri-star-line text-yellow-400 text-sm md:text-base"></i>
-                  @endif
-                @endfor
-              </div>
-              <div class="flex items-center gap-2">
-                <a href="{{ route('shop.show', $product->id) }}" class="md:text-lg text-red-600 text-md font-semibold">
-                  ${{ number_format($product->current_price, 2) }}
-                </a>
-                @if($product->original_price && $product->original_price > $product->current_price)
-                  <span class="line-through text-gray-400">${{ number_format($product->original_price, 2) }}</span>
-                @endif
-              </div>
-            </div>
-          </div>
-        @empty
-          <div class="col-span-3 text-center py-12">
-            <p class="text-gray-500 text-lg">No products found.</p>
-            <a href="{{ route('shop.index') }}" class="inline-block mt-4 bg-[#CD2C58] text-white px-6 py-2 rounded hover:bg-[#b7254b]">
-              View All Products
-            </a>
-          </div>
-        @endforelse
+           @include('shop.product-list', ['products' => $products])
       </main>
 
       <!-- Pagination -->
@@ -164,10 +102,59 @@
   </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
+
+  //Category filter
+    $(document).on('change', '.categoryCheckbox', function () {
+      applyFilters();
+    });
+ 
+
+    // Price slider change event
+    $("#priceRange").on("input", function () {
+        let maxPrice = $(this).val();
+        $("#priceValue").text(maxPrice);
+
+        applyFilters();
+    });
+
+    function applyFilters() {
+      let selectedCategories = [];
+
+      $(".categoryCheckbox:checked").each(function () {
+          selectedCategories.push($(this).val());
+      });
+
+      // If "all" checked
+      if (selectedCategories.includes("all")) {
+          selectedCategories = ["all"];
+      }
+
+      let price = $("#priceRange").val();
+
+      $.ajax({
+          url: "{{ route('filter.products') }}",
+          method: "POST",
+          data: {
+              categories: selectedCategories,
+              price: price,
+              _token: "{{ csrf_token() }}"
+          },
+          success: function (response) {
+              $("#productGrid").empty().append(response.html);
+          }
+      });
+    }
+
+
+
+
+
   // Accordion functionality
   const accBtns = document.querySelectorAll('.accordion-btn');
-  accBtns.forEach(btn => {
+    accBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const content = btn.nextElementSibling;
       const icon = btn.querySelector('.accordion-icon');
@@ -187,21 +174,21 @@
   });
 
   // Price range filter
-  const priceRange = document.getElementById('priceRange');
-  const priceValue = document.getElementById('priceValue');
-  if (priceRange && priceValue) {
-    priceRange.addEventListener('input', (e) => {
-      priceValue.textContent = e.target.value;
-      filterProducts();
-    });
-  }
+  // const priceRange = document.getElementById('priceRange');
+  // const priceValue = document.getElementById('priceValue');
+  // if (priceRange && priceValue) {
+  //   priceRange.addEventListener('input', (e) => {
+  //     priceValue.textContent = e.target.value;
+  //     filterProducts();
+  //   });
+  // }
 
   // Category filter
-  document.querySelectorAll('.categoryCheckbox').forEach(cb => {
-    cb.addEventListener('change', () => {
-      filterProducts();
-    });
-  });
+  // document.querySelectorAll('.categoryCheckbox').forEach(cb => {
+  //   cb.addEventListener('change', () => {
+  //     filterProducts();
+  //   });
+  // });
 
   function filterProducts() {
     const selectedCategories = Array.from(document.querySelectorAll('.categoryCheckbox:checked')).map(c => c.value);

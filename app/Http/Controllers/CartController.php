@@ -12,10 +12,8 @@ class CartController extends Controller
 {
     public function index()
     {
-        if (Auth::check()) {
-            $cartItems = Cart::where('user_id', Auth::id())
-                ->with('product')
-                ->get();
+       if (Auth::guard('customer')->check()) {
+            $cartItems = Cart::where('customer_id', Auth::guard('customer')->id())->with('product')->get();
 
             $total = $cartItems->sum(function ($item) {
                 return $item->total;
@@ -26,7 +24,7 @@ class CartController extends Controller
                 $product = Product::find($item['product_id']);
                 if ($product) {
                     return (object) [
-                        'id' => $item['id'],
+                        'id' => $item['product_id'],
                         'product_id' => $item['product_id'],
                         'quantity' => $item['quantity'],
                         'price' => $item['price'],
@@ -108,29 +106,28 @@ class CartController extends Controller
         ]);
 
         $product = Product::findOrFail($request->product_id);
-
-        if (Auth::check()) {
+        // dd($product);
+        if (Auth::guard('customer')->check()) {
             // Logged in user — Save DB
-            $cartItem = Cart::where('user_id', Auth::id())
-                ->where('product_id', $request->product_id)
-                ->first();
+            $cartItem = Cart::where('customer_id', Auth::guard('customer')->id())->where('product_id', $request->product_id)->first();
+          
 
             if ($cartItem) {
                 $cartItem->quantity += $request->quantity;
                 $cartItem->save();
             } else {
                 Cart::create([
-                    'user_id' => Auth::id(),
+                    'customer_id' => Auth::guard('customer')->id(),
                     'product_id' => $request->product_id,
                     'quantity' => $request->quantity,
                     'price' => $product->current_price,
                 ]);
             }
 
-            $cartItems = Cart::with('product')->where('user_id', Auth::id())->get();
-
-            $cartCount = Cart::where('user_id', Auth::id())->sum('quantity');
-            $cartTotal = Cart::where('user_id', Auth::id())->sum(DB::raw('quantity * price'));
+            $cartItems = Cart::with('product')->where('customer_id', Auth::guard('customer')->id())->get();
+        
+            $cartCount = Cart::where('customer_id', Auth::guard('customer')->id())->sum('quantity');
+            $cartTotal = Cart::where('customer_id', Auth::guard('customer')->id())->sum(DB::raw('quantity * price'));
         }
         else {
             // Guest — Session cart
@@ -188,8 +185,8 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        if (Auth::check()) {
-            $cartItem = Cart::where('user_id', Auth::id())
+        if (Auth::guard('customer')->check()) {
+            $cartItem = Cart::where('customer_id', Auth::guard('customer')->id())
                 ->where('id', $id)
                 ->firstOrFail();
 
@@ -212,8 +209,8 @@ class CartController extends Controller
 
     public function destroy($id)
     {
-        if (Auth::check()) {
-            $cartItem = Cart::where('user_id', Auth::id())
+        if (Auth::guard('customer')->check()) {
+            $cartItem = Cart::where('customer_id', Auth::guard('customer')->id())
                 ->where('id', $id)
                 ->firstOrFail();
 
@@ -232,8 +229,8 @@ class CartController extends Controller
 
     public function getCartCount()
     {
-        if (Auth::check()) {
-            $count = Cart::where('user_id', Auth::id())->sum('quantity');
+        if (Auth::guard('customer')->check()) {
+            $count = Cart::where('customer_id', Auth::guard('customer')->id())->sum('quantity');
         } else {
             $cart = session('cart', []);
             $count = array_sum(array_column($cart, 'quantity'));
@@ -243,8 +240,8 @@ class CartController extends Controller
 
     public function getCartTotal()
     {
-        if (Auth::check()) {
-            $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
+        if (Auth::guard('customer')->check()) {
+            $cartItems = Cart::where('customer_id', Auth::guard('customer')->id())->with('product')->get();
             $total = $cartItems->sum(function ($item) {
                 return $item->total;
             });

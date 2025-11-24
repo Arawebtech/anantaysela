@@ -28,31 +28,32 @@
             <div class="flex flex-col md:flex-row gap-4">
               <div class="flex-1">
                 <label class="text-[#322e29] font-semibold mb-2 block uppercase tracking-wider text-[12px]">First Name *</label>
-                <input type="text" name="first_name" value="{{ Auth::user()->name ?? '' }}" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
+                <input type="text" name="first_name" value="{{ Auth::guard('customer')->user()->first_name ?? '' }}" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
               </div>
               <div class="flex-1">
                 <label class="text-[#322e29] font-semibold mb-2 block uppercase tracking-wider text-[12px]">Last Name *</label>
-                <input type="text" name="last_name" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
+                <input type="text" name="last_name" value="{{ Auth::guard('customer')->user()->last_name ?? '' }}" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
               </div>
             </div>
             <label class="text-[#322e29] font-semibold mb-2 block uppercase tracking-wider text-[12px]">Email Address *</label>
-            <input type="email" name="email" value="{{ Auth::user()->email ?? '' }}" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
+            <input type="email" name="email" value="{{ Auth::guard('customer')->user()->email ?? '' }}" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
             <label class="text-[#322e29] font-semibold mb-2 block uppercase tracking-wider text-[12px]">Phone Number *</label>
-            <input type="tel" name="phone" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
+            <input type="tel" name="phone" value="{{ Auth::guard('customer')->user()->phone_number ?? '' }}" maxlength="10" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
             <label class="text-[#322e29] font-semibold mb-2 block uppercase tracking-wider text-[12px]">Address *</label>
-            <textarea name="shipping_address" rows="3" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required></textarea>
+            <textarea name="shipping_address" rows="3" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>{{ optional(Auth::guard('customer')->user())->address }}</textarea>
+
             <div class="flex flex-col md:flex-row gap-4">
               <div class="flex-1">
                 <label class="text-[#322e29] font-semibold mb-2 block uppercase tracking-wider text-[12px]">City *</label>
-                <input type="text" name="city" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
+                <input type="text" name="city" value="{{ Auth::guard('customer')->user()->city ?? '' }}" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
               </div>
               <div class="flex-1">
                 <label class="text-[#322e29] font-semibold mb-2 block uppercase tracking-wider text-[12px]">State *</label>
-                <input type="text" name="state" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
+                <input type="text" name="state" value="{{ Auth::guard('customer')->user()->state ?? '' }}" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
               </div>
               <div class="flex-1">
                 <label class="text-[#322e29] font-semibold mb-2 block uppercase tracking-wider text-[12px]">ZIP Code *</label>
-                <input type="text" name="zip_code" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
+                <input type="text" name="zip_code" value="{{ Auth::guard('customer')->user()->zip_code ?? '' }}" class="border-2 rounded-lg px-4 py-3 text-base w-full focus:border-[#C26E72] focus:outline-none mb-4 transition-colors" required>
               </div>
             </div>
           </div>
@@ -128,7 +129,7 @@
                 <div class="flex-1">
                   <div class="font-semibold text-[#322e29] mb-1 jost-medium text-sm">{{ $productName }}</div>
                   <div class="flex items-center gap-2 mb-1">
-                    <span class="font-bold text-[#C26E72] text-base jost-medium">${{ number_format($item->price, 2) }}</span>
+                    <span class="font-bold text-[#C26E72] text-base jost-medium">₹{{ number_format($item->price, 2) }}</span>
                   </div>
                   <div class="text-[#C26E72] text-sm jost-medium">Qty: {{ $item->quantity }}</div>
                 </div>
@@ -144,11 +145,11 @@
             </div>
             <div class="flex justify-between mb-2 text-base text-[#322e29]">
               <span>Shipping:</span>
-              <span>$0</span>
+              <span>₹0</span>
             </div>
             <div class="flex justify-between mt-4 pt-4 border-t text-lg font-bold text-[#322e29]">
               <span>Total:</span>
-              <span>${{ number_format($total, 2) }}</span>
+              <span>₹{{ number_format($total, 2) }}</span>
             </div>
           </div>
 
@@ -158,18 +159,26 @@
 
             <div class="space-y-4">
               <label class="flex items-start gap-3 border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-[#CD2C58] transition">
-                <input type="radio" name="payment_method" value="netbanking" id="netbank" class="mt-1 accent-[#CD2C58]">
+                <input type="radio" name="payment_method" value="netbanking" id="netbank" class="mt-1 accent-[#CD2C58]" checked>
                 <div>
-                  <p class="font-medium text-gray-800">Net Banking</p>
-                  <p class="text-sm text-gray-500 mt-1">Make your payment directly into our bank account.</p>
+                  <p class="font-medium text-gray-800">COD</p>
+                  <p class="text-sm text-gray-500 mt-1">Make your payment directly cod.</p>
                 </div>
               </label>
 
               <label class="flex items-start gap-3 border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-[#CD2C58] transition">
-                <input type="radio" name="payment_method" value="upi" id="upi" class="mt-1 accent-[#CD2C58]">
+                <input type="radio" name="payment_method" value="upi" id="upi" class="mt-1 accent-[#CD2C58]" >
                 <div>
                   <p class="font-medium text-gray-800">UPI</p>
                   <p class="text-sm text-gray-500 mt-1">Pay securely using your UPI ID.</p>
+                </div>
+              </label>
+
+              <label class="flex items-start gap-3 border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-[#CD2C58] transition">
+                <input type="radio" name="payment_method" value="debit_card" id="debit" class="mt-1 accent-[#CD2C58]">
+                <div>
+                  <p class="font-medium text-gray-800">Debit Card</p>
+                  <p class="text-sm text-gray-500 mt-1">Pay with your debit card securely.</p>
                 </div>
               </label>
 
@@ -181,13 +190,15 @@
                 </div>
               </label>
 
+            <div class="space-y-4">
               <label class="flex items-start gap-3 border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-[#CD2C58] transition">
-                <input type="radio" name="payment_method" value="debit_card" id="debit" class="mt-1 accent-[#CD2C58]">
+                <input type="radio" name="payment_method" value="netbanking" id="netbank" class="mt-1 accent-[#CD2C58]">
                 <div>
-                  <p class="font-medium text-gray-800">Debit Card</p>
-                  <p class="text-sm text-gray-500 mt-1">Pay with your debit card securely.</p>
+                  <p class="font-medium text-gray-800">Net Banking</p>
+                  <p class="text-sm text-gray-500 mt-1">Make your payment directly into our bank account.</p>
                 </div>
               </label>
+             
             </div>
 
             <p class="text-xs text-gray-500 leading-relaxed border-t pt-4">

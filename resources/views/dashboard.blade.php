@@ -5,7 +5,8 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="mb-8">
-        <h1 class="text-4xl font-serif font-bold text-gray-900 mb-2">Welcome back, {{ auth()->user()->name }}!</h1>
+        {{-- <h1 class="text-4xl font-serif font-bold text-gray-900 mb-2">Welcome back, {{ auth()->user()->name }}!</h1> --}}
+        <h1 class="text-4xl font-serif font-bold text-gray-900 mb-2">Welcome back, {{ optional(Auth::guard('customer')->user())->first_name }}!</h1>
         <p class="text-gray-600">Manage your account, orders, and wishlist</p>
     </div>
 
@@ -15,7 +16,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 mb-1">Total Orders</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ auth()->user()->orders()->count() }}</p>
+                    {{-- <p class="text-3xl font-bold text-gray-900">{{ auth()->user()->orders()->count() }}</p> --}}
+                    <p class="text-3xl font-bold text-gray-900">{{ Auth::guard('customer')->user()->orders()->count() }}</p>
+
                 </div>
                 <svg class="w-12 h-12 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
@@ -27,7 +30,8 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 mb-1">Wishlist Items</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ auth()->user()->wishlists()->count() }}</p>
+                    {{-- <p class="text-3xl font-bold text-gray-900">{{ auth()->user()->wishlists()->count() }}</p> --}}
+                     <p class="text-3xl font-bold text-gray-900">{{ Auth::guard('customer')->user()->wishlists()->count() }}</p>
                 </div>
                 <svg class="w-12 h-12 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
@@ -39,7 +43,10 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 mb-1">Cart Items</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ auth()->user()->carts()->sum('quantity') }}</p>
+                    {{-- <p class="text-3xl font-bold text-gray-900">{{ auth()->user()->carts()->sum('quantity') }}</p> --}}
+                    <p class="text-3xl font-bold text-gray-900">
+                        {{ Auth::guard('customer')->check() ? Auth::guard('customer')->user()->carts()->sum('quantity') : 0 }}
+                    </p>
                 </div>
                 <svg class="w-12 h-12 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
@@ -97,8 +104,11 @@
             <a href="{{ route('orders.index') }}" class="text-pink-600 hover:text-pink-800 font-semibold">View All →</a>
         </div>
         @php
-            $recentOrders = auth()->user()->orders()->latest()->take(5)->get();
+            // $recentOrders = auth()->user()->orders()->latest()->take(5)->get();
+            $customer = auth('customer')->user();
+            $recentOrders = $customer ? $customer->orders()->latest()->take(5)->get() : collect([]);
         @endphp
+        
         @if($recentOrders->count() > 0)
             <div class="overflow-x-auto">
                 <table class="w-full">

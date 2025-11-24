@@ -1,7 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+@section('admin-content')
+ <div class="w-full px-4 py-6">
     <div class="mb-8">
         <a href="{{ route('admin.orders') }}" class="text-pink-600 hover:text-pink-800 mb-4 inline-block">← Back to Orders</a>
         <h1 class="text-3xl font-bold text-gray-900">Order #{{ $order->order_number }}</h1>

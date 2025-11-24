@@ -11,22 +11,22 @@ class HomeController extends Controller
     public function index()
     {
         $featuredProducts = Product::where('featured', true)
-            ->where('is_active', true)
-            ->take(8)
-            ->get();
-
+                            ->where('is_active', true)
+                            ->take(8)
+                            ->get();
+        // dd($featuredProducts);
         // If no featured products, get latest products as featured
         if ($featuredProducts->isEmpty()) {
             $featuredProducts = Product::where('is_active', true)
-                ->orderBy('created_at', 'desc')
-                ->take(8)
-                ->get();
+                                ->orderBy('created_at', 'desc')
+                                ->take(8)
+                                ->get();
         }
 
         $latestProducts = Product::where('is_active', true)
-            ->orderBy('created_at', 'desc')
-            ->take(8)
-            ->get();
+                        ->orderBy('created_at', 'desc')
+                        ->take(8)
+                        ->get();
 
         return view('home', compact('featuredProducts', 'latestProducts'));
     }
@@ -46,12 +46,35 @@ class HomeController extends Controller
 
         $products = $query->paginate(12);
         $categories = Product::where('is_active', true)
-            ->distinct()
-            ->pluck('category')
-            ->filter();
+                    ->distinct()
+                    ->pluck('category')
+                    ->filter();
 
         return view('shop.index', compact('products', 'categories'));
     }
+
+
+    public function filter(Request $request)
+    {
+        $categories = $request->categories ?? [];
+        $price = $request->price ?? 100000;
+
+        $query = Product::where('is_active', true)->where('price', '<=', $price);
+
+        if (!empty($categories) && !in_array("all", $categories)) {
+            $query->whereIn('category', $categories);
+        }
+
+        $products = $query->get();
+
+        $html = view('shop.product-list', compact('products'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+
+
+
 
     public function showProduct($id)
     {
@@ -104,14 +127,5 @@ class HomeController extends Controller
     }
 
 
-    public function logout(Request $request)
-    {
-         Auth::logout();
-        // Session delete
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('home')->with('success', 'User logout successfully!');
-       
-    }
+   
 }

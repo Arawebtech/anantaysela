@@ -100,6 +100,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </section>
 
@@ -166,6 +167,7 @@
       </div>
     </div>
   </div>
+
 </section>
 
 <!-- Swiper JS -->
@@ -187,8 +189,61 @@
   <h2 class="text-2xl md:text-3xl text-[#222222] mb-6 jost text-center text-[34px] leading-[34px]">Featured Products</h2>
 
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+
     <!-- Product Card 1 -->
-    <div class="flex flex-col items-center relative">
+     @foreach ($featuredProducts as $product)
+      <div class="flex flex-col items-center relative">
+          <div class="bg-gray-50 cursor-pointer p-4 pb-0 relative rounded-lg overflow-hidden">
+              @if ($product->discount_percentage)
+              <span class="absolute text-sm top-2 left-2 bg-[#C26E72] text-white md:px-2 md:py-1 p-1 rounded">
+                -{{ $product->discount_percentage }}%
+              </span>
+              @endif
+
+              @auth
+                <form action="{{ route('wishlist.store') }}" method="POST" 
+                      class="absolute top-2 right-2 wishlist-form"
+                      data-product-id="{{ $product->id }}">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <button type="submit" onclick="event.stopPropagation();" 
+                        class="bg-white md:size-[30px] size-[20px] rounded-full shadow-md hover:bg-[#ffe8e8] transition wishlist-btn">
+                        <i class="ri-heart-line text-[#C26E72] text-[12px] md:text-[18px]"></i>
+                    </button>
+                </form>
+              @endauth
+               <img  src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                    class="cursor-pointer w-full h-[260px] md:h-[300px] object-contain bg-white p-2 rounded"
+                    onclick="window.location.href='{{ url('shop/'.$product->id) }}'">
+          </div>
+
+          <div class="p-4">
+              <p onclick="window.location.href='{{ url('shop/'.$product->id) }}'" class="text-start cursor-pointer text-[16px] mb-2 jost line-clamp-2">
+                {{ $product->name }}
+              </p>
+              <div class="flex mb-2 bg-white">
+                  @php
+                      $rating = floor($product->rating);
+                  @endphp
+
+                  @for ($i = 1; $i <= 5; $i++)
+                      @if ($i <= $rating)
+                          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
+                      @else
+                          <i class="ri-star-line text-yellow-400 text-sm md:text-xl"></i>
+                      @endif
+                  @endfor
+              </div>
+              <span class="md:text-lg text-md font-semibold">
+                  @if ($product->original_price > $product->price)
+                      <span class="line-through text-gray-500">₹{{ $product->original_price }}</span>
+                  @endif
+                  <span class="text-[#E01A2B] font-medium ml-1">₹{{ $product->price }}</span>
+              </span>
+          </div>
+      </div>
+    @endforeach
+    {{-- <div class="flex flex-col items-center relative">
       <div class="bg-gray-50 cursor-pointer p-4 pb-0 relative rounded-lg overflow-hidden">
         <span class="absolute text-sm top-2 left-2 bg-[#C26E72] text-white md:px-2 md:py-1 p-1 rounded">-4%</span>
         @auth
@@ -218,97 +273,8 @@
           <span class="text-[#E01A2B] font-medium ml-1">$25</span>
         </span>
       </div>
-    </div>
+    </div> --}}
 
-    <!-- Product Card 2 -->
-    <div class="flex flex-col items-center relative">
-      <div class="bg-gray-50 p-4 pb-0 relative">
-        @auth
-          <form action="{{ route('wishlist.store') }}" method="POST" class="absolute top-2 right-2 wishlist-form" data-product-id="{{ $featuredProducts[1]->id ?? 2 }}">
-            @csrf
-            <input type="hidden" name="product_id" value="{{ $featuredProducts[1]->id ?? 2 }}">
-            <button type="submit" onclick="event.stopPropagation();" class="bg-white size-[20px] md:size-[30px] flex items-center justify-center rounded-full shadow-md hover:bg-[#ffe8e8] transition wishlist-btn">
-              <i class="ri-heart-line text-[#C26E72] text-[12px] md:text-[18px] wishlist-icon"></i>
-            </button>
-          </form>
-        @endauth
-        <img onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer" src="{{ asset('theme/imgs/home/10.png') }}" alt="img">
-      </div>
-      <div class="p-4">
-        <p onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer text-start text-[16px] mb-2 jost line-clamp-2">New Classynest Purple Floral Peplum Top</p>
-        <div class="flex mb-2 bg-white">
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-line text-yellow-400 text-sm md:text-xl"></i>
-        </div>
-        <span class="md:text-lg text-md font-semibold">
-          <span class="line-through text-gray-500">$26</span>
-          <span class="text-[#E01A2B] font-medium ml-1">$25</span>
-        </span>
-      </div>
-    </div>
-
-    <!-- Product Card 3 -->
-    <div class="flex flex-col items-center relative">
-      <div class="bg-gray-50 p-4 pb-0 relative">
-        @auth
-          <form action="{{ route('wishlist.store') }}" method="POST" class="absolute top-2 right-2 wishlist-form" data-product-id="{{ $featuredProducts[2]->id ?? 3 }}">
-            @csrf
-            <input type="hidden" name="product_id" value="{{ $featuredProducts[2]->id ?? 3 }}">
-            <button type="submit" onclick="event.stopPropagation();" class="bg-white size-[20px] md:size-[30px] flex items-center justify-center rounded-full shadow-md hover:bg-[#ffe8e8] transition wishlist-btn">
-              <i class="ri-heart-line text-[#C26E72] text-[12px] md:text-[18px] wishlist-icon"></i>
-            </button>
-          </form>
-        @endauth
-        <img src="{{ asset('theme/imgs/home/11.png') }}" alt="" onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer">
-      </div>
-      <div class="p-4">
-        <p onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer text-start text-[16px] mb-2 jost line-clamp-2">New Classynest Purple Floral Peplum Top</p>
-        <div class="flex mb-2 bg-white">
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-line text-yellow-400 text-sm md:text-xl"></i>
-        </div>
-        <span class="md:text-lg text-md font-semibold">
-          <span class="line-through text-gray-500">$26</span>
-          <span class="text-[#E01A2B] font-medium ml-1">$25</span>
-        </span>
-      </div>
-    </div>
-
-    <!-- Product Card 4 -->
-    <div class="flex flex-col items-center relative">
-      <div class="bg-gray-50 p-4 pb-0 relative">
-        @auth
-          <form action="{{ route('wishlist.store') }}" method="POST" class="absolute top-2 right-2 wishlist-form" data-product-id="{{ $featuredProducts[3]->id ?? 4 }}">
-            @csrf
-            <input type="hidden" name="product_id" value="{{ $featuredProducts[3]->id ?? 4 }}">
-            <button type="submit" onclick="event.stopPropagation();" class="bg-white size-[20px] md:size-[30px] flex items-center justify-center rounded-full shadow-md hover:bg-[#ffe8e8] transition wishlist-btn">
-              <i class="ri-heart-line text-[#C26E72] text-[12px] md:text-[18px] wishlist-icon"></i>
-            </button>
-          </form>
-        @endauth
-        <img src="{{ asset('theme/imgs/home/12.png') }}" alt="img" onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer">
-      </div>
-      <div class="p-4">
-        <p onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer text-start text-[16px] mb-2 jost line-clamp-2">New Classynest Purple Floral Peplum Top</p>
-        <div class="flex mb-2 bg-white">
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-line text-yellow-400 text-sm md:text-xl"></i>
-        </div>
-        <span class="md:text-lg text-md font-semibold">
-          <span class="line-through text-gray-500">$26</span>
-          <span class="text-[#E01A2B] font-medium ml-1">$25</span>
-        </span>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -426,37 +392,63 @@
 
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
     <!-- Product Card 1 -->
-    <div class="flex flex-col items-center relative">
-      <div class="bg-gray-50 p-4 pb-0 relative">
-        <span class="absolute top-2 left-2 text-sm bg-[#E01A2B] text-white md:px-2 p-1 md:py-1">- 4%</span>
-        @auth
-          <form action="{{ route('wishlist.store') }}" method="POST" class="absolute top-2 right-2 wishlist-form" data-product-id="{{ $latestProducts[0]->id ?? 1 }}">
-            @csrf
-            <input type="hidden" name="product_id" value="{{ $latestProducts[0]->id ?? 1 }}">
-            <button type="submit" onclick="event.stopPropagation();" class="bg-white size-[20px] md:size-[30px] flex items-center justify-center rounded-full shadow-md hover:bg-[#ffe8e8] transition wishlist-btn">
-              <i class="ri-heart-line text-[#C26E72] text-[12px] md:text-[18px] wishlist-icon"></i>
-            </button>
-          </form>
-        @endauth
-        <img src="{{ asset('theme/imgs/home/13.png') }}" alt="img" onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer w-full h-auto object-contain">
-      </div>
-      <div class="p-4">
-        <p onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer text-start text-[16px] mb-2 jost line-clamp-2">New Classynest Purple Floral Peplum Top</p>
-        <div class="flex mb-2 bg-white">
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-line text-yellow-400 text-sm md:text-xl"></i>
-        </div>
-        <span class="md:text-lg text-md font-semibold">
-          <span class="line-through text-gray-500">$26</span>
-          <span class="text-[#E01A2B] font-medium ml-1">$25</span>
-        </span>
-      </div>
-    </div>
+    @foreach ($latestProducts as $product)
+      <div class="flex flex-col items-center relative">
+          <div class="bg-gray-50 p-4 pb-0 relative rounded-lg overflow-hidden">
+              @if ($product->discount_percentage)
+              <span class="absolute top-2 left-2 text-sm bg-[#E01A2B] text-white md:px-2 p-1 md:py-1 rounded">
+                -{{ $product->discount_percentage }}%
+              </span>
+              @endif
 
-    <!-- Product Card 2 -->
+              @auth
+              <form action="{{ route('wishlist.store') }}" method="POST"
+                    class="absolute top-2 right-2 wishlist-form"
+                    data-product-id="{{ $product->id }}">
+                  @csrf
+                  <input type="hidden" name="product_id" value="{{ $product->id }}">
+                  <button type="submit" onclick="event.stopPropagation();"
+                      class="bg-white size-[20px] md:size-[30px] flex items-center justify-center rounded-full shadow-md hover:bg-[#ffe8e8] transition wishlist-btn">
+                      <i class="ri-heart-line text-[#C26E72] text-[12px] md:text-[18px] wishlist-icon"></i>
+                  </button>
+              </form>
+              @endauth
+
+                <img  src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                    class="cursor-pointer w-full h-[260px] md:h-[300px] object-contain bg-white p-2 rounded"
+                    onclick="window.location.href='{{ url('shop/'.$product->id) }}'">
+
+
+             {{-- <img src="{{ Str::startsWith($image, 'http') ? $image : asset('storage/' . $image) }}" alt="{{ $product->name }}" onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer w-full h-auto object-contain" width="100%" height="100%"> --}}
+          </div>
+
+          <div class="p-4">
+              <p onclick="window.location.href='{{ url('shop/'.$product->id) }}'" class="cursor-pointer text-start text-[16px] mb-2 jost line-clamp-2">
+                  {{ $product->name }}
+              </p>
+
+              <div class="flex mb-2 bg-white">
+                  @php $rating = floor($product->rating); @endphp
+                  @for ($i = 1; $i <= 5; $i++)
+                      @if ($i <= $rating)
+                          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
+                      @else
+                          <i class="ri-star-line text-yellow-400 text-sm md:text-xl"></i>
+                      @endif
+                  @endfor
+              </div>
+
+              <span class="md:text-lg text-md font-semibold">
+                  @if ($product->original_price > $product->price)
+                      <span class="line-through text-gray-500">₹{{ $product->original_price }}</span>
+                  @endif
+                  <span class="text-[#E01A2B] font-medium ml-1">₹{{ $product->price }}</span>
+              </span>
+          </div>
+      </div>
+    @endforeach
+    
+    {{-- <!-- Product Card 2 -->
     <div class="flex flex-col items-center relative">
       <div class="bg-gray-50 p-4 pb-0 relative">
         @auth
@@ -484,67 +476,8 @@
           <span class="text-[#E01A2B] font-medium ml-1">$25</span>
         </span>
       </div>
-    </div>
+    </div> --}}
 
-    <!-- Product Card 3 -->
-    <div class="flex flex-col items-center relative">
-      <div class="bg-gray-50 p-4 pb-0 relative">
-        @auth
-          <form action="{{ route('wishlist.store') }}" method="POST" class="absolute top-2 right-2 wishlist-form" data-product-id="{{ $latestProducts[2]->id ?? 3 }}">
-            @csrf
-            <input type="hidden" name="product_id" value="{{ $latestProducts[2]->id ?? 3 }}">
-            <button type="submit" onclick="event.stopPropagation();" class="bg-white size-[20px] md:size-[30px] flex items-center justify-center rounded-full shadow-md hover:bg-[#ffe8e8] transition wishlist-btn">
-              <i class="ri-heart-line text-[#C26E72] text-[12px] md:text-[18px] wishlist-icon"></i>
-            </button>
-          </form>
-        @endauth
-        <img src="{{ asset('theme/imgs/home/11.png') }}" alt="img" onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer">
-      </div>
-      <div class="p-4">
-        <p onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer text-start text-[16px] mb-2 jost line-clamp-2">New Classynest Purple Floral Peplum Top</p>
-        <div class="flex mb-2 bg-white">
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-line text-yellow-400 text-sm md:text-xl"></i>
-        </div>
-        <span class="md:text-lg text-md font-semibold">
-          <span class="line-through text-gray-500">$26</span>
-          <span class="text-[#E01A2B] font-medium ml-1">$25</span>
-        </span>
-      </div>
-    </div>
-
-    <!-- Product Card 4 -->
-    <div class="flex flex-col items-center relative">
-      <div class="bg-gray-50 p-4 pb-0 relative">
-        @auth
-          <form action="{{ route('wishlist.store') }}" method="POST" class="absolute top-2 right-2 wishlist-form" data-product-id="{{ $latestProducts[3]->id ?? 4 }}">
-            @csrf
-            <input type="hidden" name="product_id" value="{{ $latestProducts[3]->id ?? 4 }}">
-            <button type="submit" onclick="event.stopPropagation();" class="bg-white size-[20px] md:size-[30px] flex items-center justify-center rounded-full shadow-md hover:bg-[#ffe8e8] transition wishlist-btn">
-              <i class="ri-heart-line text-[#C26E72] text-[12px] md:text-[18px] wishlist-icon"></i>
-            </button>
-          </form>
-        @endauth
-        <img src="{{ asset('theme/imgs/home/13.png') }}" alt="img" onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer">
-      </div>
-      <div class="p-4">
-        <p onclick="window.location.href='{{ route('shop.index') }}'" class="cursor-pointer text-start text-[16px] mb-2 jost line-clamp-2">New Classynest Purple Floral Peplum Top</p>
-        <div class="flex mb-2 bg-white">
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-fill text-yellow-400 text-sm md:text-xl"></i>
-          <i class="ri-star-line text-yellow-400 text-sm md:text-xl"></i>
-        </div>
-        <span class="md:text-lg text-md font-semibold">
-          <span class="line-through text-gray-500">$26</span>
-          <span class="text-[#E01A2B] font-medium ml-1">$25</span>
-        </span>
-      </div>
-    </div>
   </div>
 </div>
 

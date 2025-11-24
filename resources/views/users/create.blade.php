@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
+@section('admin-content')
 <div class="container">
     <h1>Create User</h1>
     <form action="{{ route('users.store') }}" method="POST">

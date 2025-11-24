@@ -1,7 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+@section('admin-content')
+ <div class="w-full px-4 py-6">
     <h2 class="text-3xl font-bold text-gray-900 mb-6">Edit Product</h2>
     
     <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded-lg p-6">
@@ -89,6 +89,41 @@
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
+            @php
+                $selectedSizes = $product->size;
+               
+                // JSON stored hai to decode
+                if (is_string($selectedSizes)) {
+                    $selectedSizes = json_decode($selectedSizes, true);
+                }
+
+                // agar decode ke baad bhi null ya non-array ho
+                if (!is_array($selectedSizes)) {
+                    $selectedSizes = [];
+                }
+            @endphp
+
+            <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Size</label>
+            <select name="size[]" multiple
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500">
+                @php
+                    $sizes = ['S', 'M', 'L', 'XL'];
+                @endphp
+
+                @foreach ($sizes as $size)
+                    <option value="{{ $size }}" {{ in_array($size, $selectedSizes) ? 'selected' : '' }}>
+                        {{ $size }}
+                    </option>
+                @endforeach
+            </select>
+
+
+                @error('size')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
 
             <!-- Rating Count -->
             <div>
@@ -125,6 +160,36 @@
                 </label>
             </div>
 
+           <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Thumbnail Images</label>
+
+            <div class="flex flex-wrap gap-3" id="thumbnail-wrapper">
+                @php
+                    $thumbnails = $product->thumbnail_image ? explode(',', $product->thumbnail_image) : [];
+                @endphp
+
+                @foreach ($thumbnails as $thumb)
+                    @if(trim($thumb) != '')
+                        <div class="relative thumb-box" data-path="{{ $thumb }}">
+                            <img src="{{ Storage::url($thumb) }}" class="w-24 h-24 object-cover border rounded">
+
+                            <!-- ❌ Remove Button -->
+                            <button type="button"
+                                class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full px-[6px] text-xs remove-thumb"
+                                data-image="{{ $thumb }}">
+                                ✕
+                            </button>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+
+            <input type="file" name="thumbnail_image[]" id="thumbnail_image" accept="image/*" multiple
+                class="w-full mt-3 px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+
+
+
             <!-- Active -->
             <div>
                 <label class="flex items-center">
@@ -140,4 +205,37 @@
         </div>
     </form>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+    document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("remove-thumb")) {
+            let image = e.target.getAttribute("data-image");
+            let productId = "{{ $product->id }}";
+
+            if (!confirm("Are you sure?")) return;
+
+            fetch("{{ route('admin.delete') }}", {
+                method: "DELETE",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ image: image, product_id: productId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    e.target.closest(".thumb-box").remove(); // UI se remove
+                }
+            });
+        }
+    });
+</script>
+
 @endsection
+
+
+
+

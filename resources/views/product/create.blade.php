@@ -1,7 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+@section('admin-content')
+ <div class="w-full px-4 py-6">
     <h2 class="text-3xl font-bold text-gray-900 mb-6">Add Product</h2>
     
     <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded-lg p-6">
@@ -89,6 +89,21 @@
                 @enderror
             </div>
 
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Size</label>
+                <select name="size[]" multiple
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500">
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                </select>
+                @error('size')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+
             <!-- Rating Count -->
             <div>
                 <label for="rating_count" class="block text-sm font-medium text-gray-700 mb-2">Rating Count</label>
@@ -106,6 +121,18 @@
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
+
+            <div class="md:col-span-2">
+                <label for="image" class="block text-sm font-medium text-gray-700 mb-2">Thumbnail Image</label>
+                <input type="file" name="thumbnail_image[]" id="thumbnail_image" accept="image/*" multiple
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+
+
+                @error('thumbnail_image')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            
 
             <!-- Featured -->
             <div>

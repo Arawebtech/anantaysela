@@ -13,7 +13,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.login.submit') }}">
+    <form method="POST" action="{{ route('customer.login.submit') }}">
         @csrf
 
         <!-- Email Address -->
@@ -68,7 +68,7 @@
         <div class="mt-6 text-center">
             <p class="text-sm text-gray-600">
                 Don't have an account?
-                <a href="{{ route('register') }}" class="text-pink-600 hover:text-pink-800 font-semibold">
+                <a href="{{ route('customer.register') }}" class="text-pink-600 hover:text-pink-800 font-semibold">
                     Sign Up
                 </a>
             </p>

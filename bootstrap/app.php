@@ -17,6 +17,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
     })
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'adminauth' => \App\Http\Middleware\AdminAuthenticate::class,
+            'customer.guest' => \App\Http\Middleware\RedirectIfCustomerAuthenticated::class,
+        ]);
+    })
+
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

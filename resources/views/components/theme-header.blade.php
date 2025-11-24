@@ -64,15 +64,21 @@
 
       <!-- Icons -->
       <div class="flex items-center gap-4">
-        @auth
-          <a href="{{ route('dashboard') }}" class="ri-user-line text-[22px]"></a>
-           <a href="{{ route('customerlogout') }}"
-            class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition btn-sm" >
-              <i class="ri-logout-box-r-line text-[18px]"></i> Logout
-          </a>
+        @if(Auth::guard('customer')->check())
+            <a href="{{ route('dashboard') }}" class="ri-user-line text-[22px]"></a>
+
+            <span class="text-gray-800 font-semibold ml-2">
+                {{ ucfirst(Auth::guard('customer')->user()->first_name) }}
+            </span>
+
+            <a href="{{ route('customerlogout') }}"
+                class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition btn-sm">
+                <i class="ri-logout-box-r-line text-[18px]"></i> Logout
+            </a>
         @else
-          <a href="{{ route('login') }}" class="ri-user-line text-[22px]"></a>
-        @endauth
+            <a href="{{ route('customer.login') }}" class="ri-user-line text-[22px]"></a>
+        @endif
+
         <a href="{{ route('wishlist') }}" class="ri-heart-line text-[22px] relative">
           <span id="wishlist-badge" class="absolute -top-1 -right-1 w-[14px] h-[14px] bg-[#CD2C58] text-white text-[10px] flex items-center justify-center rounded-full">0</span>
         </a>
@@ -151,16 +157,19 @@
 <!-- ===== JS ===== -->
 
 <!-- Cart Sidebar -->
-<div id="cartSidebar" class="fixed top-0 right-0 w-80 h-[60vh] bg-white shadow-xl translate-x-full transition-transform duration-300 z-50 rounded-b-xl">
-  <div class="p-4 flex justify-between items-center border-b">
+<div id="cartSidebar" class="fixed top-0 right-0 w-80 h-[60vh] bg-white shadow-xl translate-x-full transition-transform duration-300 z-50 rounded-b-xl flex flex-col">
+  <div class="p-4 flex justify-between items-center border-b flex-shrink-0">
     <h2 class="text-lg font-semibold">Your Cart</h2>
     <button id="closeCart" class="text-gray-600 text-xl">&times;</button>
   </div>
-   <div id="cartSidebarBody" class="p-4">
-      <p class="text-center text-gray-500">Cart is empty...</p>
+
+  <!-- Scrollable body -->
+  <div id="cartSidebarBody" class="p-4 overflow-y-auto flex-grow space-y-4 custom-scroll">
+    <p class="text-center text-gray-500">Cart is empty...</p>
   </div>
+
 </div>
-<!-- Background overlay -->
+
 <div id="overlay" class="fixed inset-0 bg-black bg-opacity-40 hidden z-40"></div>
 
 

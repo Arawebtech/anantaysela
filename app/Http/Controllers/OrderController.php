@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Cart;
+use App\Models\Customer;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::where('user_id', Auth::id())
+        $orders = Order::where('customer_id', Auth::guard('customer')->id())
             ->with('items.product')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -24,7 +25,7 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        $order = Order::where('user_id', Auth::id())
+        $order = Order::where('customer_id', Auth::guard('customer')->id())
             ->with('items.product')
             ->findOrFail($id);
 
@@ -49,9 +50,7 @@ class OrderController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $cartItems = Cart::where('user_id', Auth::id())
-            ->with('product')
-            ->get();
+        $cartItems = Cart::where('customer_id', Auth::guard('customer')->id())->with('product')->get();
 
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
@@ -64,7 +63,7 @@ class OrderController extends Controller
             });
 
             $order = Order::create([
-                'user_id' => Auth::id(),
+                'customer_id' => Auth::guard('customer')->id(),
                 'total_amount' => $total,
                 'shipping_address' => $request->shipping_address,
                 'billing_address' => $request->billing_address ?? $request->shipping_address,
@@ -86,28 +85,39 @@ class OrderController extends Controller
                 ]);
             }
 
+            if ($customer = Auth::guard('customer')->user()) {
+                $customer->update([
+                    'first_name' => $request->first_name,
+                    'last_name'  => $request->last_name,
+                    'email'      => $request->email,
+                    'phone_number' => $request->phone,
+                    'address' => $request->shipping_address,
+                    'city' => $request->city,
+                    'state' => $request->state,
+                    'zip_code' => $request->zip_code,
+                ]);
+            }
             // Clear cart
-            Cart::where('user_id', Auth::id())->delete();
+            Cart::where('customer_id', Auth::guard('customer')->id())->delete();
 
             DB::commit();
 
-            return redirect()->route('orders.show', $order->id)
-                ->with('success', 'Order placed successfully!');
-        } catch (\Exception $e) {
+            return redirect()->route('orders.show', $order->id)->with('success', 'Order placed successfully!');
+        } catch (\Throwable $e) {
             DB::rollBack();
-            return redirect()->route('cart.index')
-                ->with('error', 'Failed to place order. Please try again.');
+            return redirect()->route('cart.index')->with('error', 'Failed to place order. Please try again. (See logs)');
         }
     }
+
 
     public function checkout()
     {
         // Check if user is authenticated
-        if (!Auth::check()) {
+        if (!Auth::guard('customer')->check()) {
             return redirect()->route('login')->with('error', 'Please login to proceed to checkout.');
         }
 
-        $cartItems = Cart::where('user_id', Auth::id())
+        $cartItems = Cart::where('customer_id', Auth::guard('customer')->id())
             ->with('product')
             ->get();
 
@@ -118,7 +128,7 @@ class OrderController extends Controller
             foreach ($sessionCart as $item) {
                 $product = Product::find($item['product_id']);
                 if ($product) {
-                    $existingCart = Cart::where('user_id', Auth::id())
+                    $existingCart = Cart::where('customer_id', Auth::guard('customer')->id())
                         ->where('product_id', $item['product_id'])
                         ->first();
 
@@ -127,7 +137,7 @@ class OrderController extends Controller
                         $existingCart->save();
                     } else {
                         Cart::create([
-                            'user_id' => Auth::id(),
+                            'customer_id' => Auth::guard('customer')->id(),
                             'product_id' => $item['product_id'],
                             'quantity' => $item['quantity'],
                             'price' => $item['price'],
@@ -136,7 +146,7 @@ class OrderController extends Controller
                 }
             }
             session()->forget('cart');
-            $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
+            $cartItems = Cart::where('customer_id', Auth::guard('customer')->id())->with('product')->get();
         }
 
         if ($cartItems->isEmpty()) {

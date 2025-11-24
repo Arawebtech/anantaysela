@@ -1,7 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+@section('admin-content')
+ <div class="w-full px-4 py-6">
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-900">Orders Management</h1>
         <a href="{{ route('admin.dashboard') }}" class="text-pink-600 hover:text-pink-800">← Back to Dashboard</a>
@@ -25,7 +25,7 @@
                     @forelse($orders as $order)
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $order->order_number }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $order->user->name ?? 'Guest' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $order->customer->first_name ?? 'Guest' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $order->created_at->format('M d, Y H:i') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">₹{{ number_format($order->total_amount, 2) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -46,6 +46,11 @@
                                 <input type="hidden" name="status" value="delivered">
                                 <button type="submit" class="text-green-600 hover:text-green-900" onclick="return confirm('Mark this order as delivered?')">Mark Delivered</button>
                             </form>
+                            {{-- <a href="javascript:void(0)" 
+                                class="text-pink-600 hover:text-yellow-900 mr-3"
+                                @click="openModal = true; selectedOrder = {{ $order->toJson() }}">
+                                Invoices
+                                </a> --}}
                         </td>
                     </tr>
                     @empty
@@ -61,5 +66,7 @@
         </div>
     </div>
 </div>
+
+
 @endsection
 

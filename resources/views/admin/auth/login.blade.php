@@ -65,14 +65,14 @@
             Sign In
         </button>
 
-        <div class="mt-6 text-center">
+        {{-- <div class="mt-6 text-center">
             <p class="text-sm text-gray-600">
                 Don't have an account?
                 <a href="{{ route('register') }}" class="text-pink-600 hover:text-pink-800 font-semibold">
                     Sign Up
                 </a>
             </p>
-        </div>
+        </div> --}}
 
         <div class="mt-4 text-center">
             <a href="{{ route('home') }}" class="text-sm text-gray-600 hover:text-gray-900">

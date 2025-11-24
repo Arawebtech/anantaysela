@@ -55,7 +55,7 @@
                     @endif
                     <p class="text-[#555] jost">{{ $productName }}</p>
                   </td>
-                  <td class="p-4 text-center text-[#555]">${{ number_format($item->price, 2) }}</td>
+                  <td class="p-4 text-center text-[#555]">₹{{ number_format($item->price, 2) }}</td>
                   <td class="p-4 text-center">
                     <form action="{{ route('cart.update', $item->id) }}" method="POST" class="inline-flex items-center">
                       @csrf
@@ -66,7 +66,7 @@
                       </button>
                     </form>
                   </td>
-                  <td class="p-4 text-center text-[#000000] font-medium">${{ number_format($item->total, 2) }}</td>
+                  <td class="p-4 text-center text-[#000000] font-medium">₹{{ number_format($item->total, 2) }}</td>
                   <td class="p-4 text-center text-[21px] text-[#CD2C58] cursor-pointer">
                     <form action="{{ route('cart.destroy', $item->id) }}" method="POST" class="inline">
                       @csrf
@@ -88,13 +88,13 @@
         <h3 class="text-xl font-semibold mb-4 poppins text-[32px] leading-[100%] tracking-wider text-[#222]">Cart Totals</h3>
         <div class="flex font-medium justify-between py-2 border-b text-[#333]">
           <p>Subtotal</p>
-          <p>${{ number_format($total, 2) }}</p>
+          <p>₹{{ number_format($total, 2) }}</p>
         </div>
         <div class="flex justify-between py-2 text-[#CD2C58] font-semibold">
           <p>Total</p>
-          <p>${{ number_format($total, 2) }}</p>
+          <p>₹{{ number_format($total, 2) }}</p>
         </div>
-        @auth
+        @auth('customer')
           <a href="{{ route('checkout') }}" class="mt-5 w-full border border-[#222] py-2 rounded hover:bg-[#222] hover:text-white transition block text-center">
             Check Out
           </a>

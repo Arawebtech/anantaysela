@@ -1,6 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
+@section('admin-content')
+ 
 <div class="container">
     <h1>Users</h1>
     @can('create-users')

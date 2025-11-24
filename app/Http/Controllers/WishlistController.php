@@ -11,7 +11,7 @@ class WishlistController extends Controller
 {
     public function index()
     {
-        $wishlistItems = Wishlist::where('user_id', Auth::id())
+        $wishlistItems = Wishlist::where('customer_id', Auth::guard('customer')->id())
             ->with('product')
             ->get();
 
@@ -24,7 +24,7 @@ class WishlistController extends Controller
             'product_id' => 'required|exists:products,id',
         ]);
 
-        $existing = Wishlist::where('user_id', Auth::id())
+        $existing = Wishlist::where('customer_id', Auth::guard('customer')->id())
             ->where('product_id', $request->product_id)
             ->first();
 
@@ -36,7 +36,7 @@ class WishlistController extends Controller
         }
 
         Wishlist::create([
-            'user_id' => Auth::id(),
+            'cusotmer_id' => Auth::guard('customer')->id(),
             'product_id' => $request->product_id,
         ]);
 
@@ -49,7 +49,7 @@ class WishlistController extends Controller
 
     public function destroy($id)
     {
-        $wishlistItem = Wishlist::where('user_id', Auth::id())
+        $wishlistItem = Wishlist::where('customer_id', Auth::guard('customer')->id())
             ->where('id', $id)
             ->firstOrFail();
 
@@ -60,7 +60,7 @@ class WishlistController extends Controller
 
     public function getCount()
     {
-        $count = Wishlist::where('user_id', Auth::id())->count();
+        $count = Wishlist::where('customer_id', Auth::guard('customer')->id())->count();
         return response()->json(['count' => $count]);
     }
 }
